@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.dao.EmployeeMapperPlus">
+    <resultMap id="MyEmp" type="emp">
+       <id column="id" property="id"/>
+       <result column="last_name" property="last_name"/>
+       <result column="email" property="email"/>
+       <result column="gender" property="gender"/>
+    </resultMap>
+
+    <resultMap id="MyEmpPlus" type="emp">
+      <id column="id" property="id" />
+        <result column="last_name" property="last_name"/>
+        <result column="email" property="email" />
+        <result column="gender" property="gender"/>
+        <result column="did" property="department.id"/>
+        <result column="departmentName" property="department.departmentName"/>
+    </resultMap>
+
+    <resultMap id="MyEmpPlus2" type="emp">
+        <id column="id" property="id" />
+        <result column="last_name" property="last_name"/>
+        <result column="email" property="email" />
+        <result column="gender" property="gender"/>
+        <association property="department" javaType="com.learn.bean.Department">
+        <id column="did" property="id"/>
+            <result column="departmentName" property="departmentName"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="MyEmpByStep" type="emp">
+        <id column="id" property="id" />
+        <result column="last_name" property="last_name"/>
+        <result column="email" property="email" />
+        <result column="gender" property="gender"/>
+        <discriminator javaType="string" column="gender">
+            <case value="男" resultType="emp">
+                <id column="id" property="id" />
+                <result column="last_name" property="last_name"/>
+                <result column="last_name" property="email" />
+                <result column="gender" property="gender"/>
+            </case>
+            <case value="女" resultType="emp">
+                <association property="department" select="com.learn.dao.DepartmentMapper.getDeptById" column="d_id">
+                </association>
+            </case>
+        </discriminator>
+    </resultMap>
+
+    <select id="getEmpById" resultMap="MyEmp">
+     select * from tbl_employee where id = #{id}
+    </select>
+
+    <select id="getEmpAndDept" resultMap="MyEmpPlus2">
+        SELECT e.id id,e.last_name last_name,e.email email,e.gender gender,e.d_id d_id,d.id did,d.departmentName departmentName
+        FROM tbl_employee e,tbl_dept d
+        WHERE e.d_id=d.id AND e.id = #{id}
+    </select>
+
+    <select id="getEmpByIdStep" resultMap="MyEmpByStep">
+        select * from tbl_employee where id = #{id}
+    </select>
+
+    <select id="getEmpsByDeptId" resultType="emp">
+        select * from tbl_employee where d_id = #{deptId}
+    </select>
+
+
+</mapper>
